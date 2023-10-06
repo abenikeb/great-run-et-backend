@@ -15,6 +15,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { Users } from './user/entities/user.entity';
 import { SubCategoriesModule } from './sub_categories/sub_categories.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { Subscription } from './subscriptions/entities/subscription.entity';
 
 @Module({
   imports: [
@@ -29,12 +31,13 @@ import { SubCategoriesModule } from './sub_categories/sub_categories.module';
       username: 'root',
       password: '',
       database: 'great_run', // your database name
-      entities: [Users],
+      entities: [Users, Subscription],
       synchronize: true, // for dev envirnoment only
     }),
     AuthModule,
     UserModule,
     SubCategoriesModule,
+    SubscriptionsModule,
   ],
   controllers: [AppController],
   providers: [
