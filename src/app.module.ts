@@ -14,7 +14,6 @@ import { UserModule } from './user/user.module';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { Users } from './user/entities/user.entity';
-import { Categories } from './sub_categories/entities/sub_category.entity';
 import { SubCategoriesModule } from './sub_categories/sub_categories.module';
 
 @Module({
@@ -29,7 +28,7 @@ import { SubCategoriesModule } from './sub_categories/sub_categories.module';
       port: 3306,
       username: 'root',
       password: '',
-      database: '', // your database
+      database: '', // your database name
       entities: [Users],
       synchronize: true, // for dev envirnoment only
     }),
