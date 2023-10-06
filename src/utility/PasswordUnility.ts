@@ -10,6 +10,7 @@ export const GeneratePassword = async (password?: string, salt?: string) => {
 
 export const ValidatePassword = async (
   enteredPassword: string,
+
   savedPassword: string,
   salt: string,
 ) => {

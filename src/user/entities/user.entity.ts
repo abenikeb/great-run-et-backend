@@ -5,7 +5,6 @@ import {
   OneToMany,
   CreateDateColumn,
 } from 'typeorm';
-import { Product } from 'src/product/entities/product.entity';
 
 @Entity()
 export class Users {

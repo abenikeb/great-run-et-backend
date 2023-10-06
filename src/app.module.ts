@@ -28,7 +28,7 @@ import { SubCategoriesModule } from './sub_categories/sub_categories.module';
       port: 3306,
       username: 'root',
       password: '',
-      database: '', // your database name
+      database: 'great_run', // your database name
       entities: [Users],
       synchronize: true, // for dev envirnoment only
     }),
