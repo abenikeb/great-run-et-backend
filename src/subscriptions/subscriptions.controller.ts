@@ -6,23 +6,34 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
+  Res,
+  SetMetadata,
 } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
+import { query, Response, Request } from 'express';
+
+const IS_PUBLIC_KEY = 'isPublic';
+const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  @Post()
-  create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
-    return this.subscriptionsService.create(createSubscriptionDto);
+  @Public()
+  @Post('create')
+  create(
+    @Body() createSubscriptionDto: CreateSubscriptionDto,
+    @Res() res: Response,
+  ) {
+    return this.subscriptionsService.create(createSubscriptionDto, res);
   }
 
-  @Get()
-  findAll() {
-    return this.subscriptionsService.findAll();
+  @Get('get-all')
+  async findAll(@Query('ownerTel') ownerTel: string, @Res() res: Response) {
+    return this.subscriptionsService.findAll(ownerTel, res);
   }
 
   @Get(':id')

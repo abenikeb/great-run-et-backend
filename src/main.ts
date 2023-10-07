@@ -35,7 +35,7 @@ async function bootstrap() {
   // app.use(csurf());
   app.use(helmet());
   app.enableCors(corsOptions);
-  app.useGlobalFilters(new AllExceptionsFilter());
+  // app.useGlobalFilters(new AllExceptionsFilter());
 
   await app.listen(8000);
 }

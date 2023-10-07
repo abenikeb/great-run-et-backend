@@ -11,7 +11,10 @@ export class Subscription {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
+  ownerName: string;
+
+  @Column({ nullable: true })
   firstName: string;
 
   @Column({ nullable: true })
@@ -50,14 +53,17 @@ export class Subscription {
   @Column()
   price: string;
 
-  @Column()
+  @Column({ nullable: true })
   self: number;
 
-  @Column()
+  @Column({ nullable: true })
   other: number;
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
   createdDate: Date;
+
+  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  updatedDate: Date;
 
   @Column({ default: true })
   isSelf: boolean;

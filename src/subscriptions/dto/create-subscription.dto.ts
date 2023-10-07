@@ -1,5 +1,6 @@
 import {
   IsString,
+  IsNotEmpty,
   IsOptional,
   IsNumber,
   IsBoolean,
@@ -7,6 +8,11 @@ import {
 } from 'class-validator';
 
 export class CreateSubscriptionDto {
+  @IsOptional()
+  @IsString()
+  ownerName: string;
+
+  @IsOptional()
   @IsString()
   firstName: string;
 
@@ -14,23 +20,28 @@ export class CreateSubscriptionDto {
   @IsString()
   middleName?: string;
 
+  @IsOptional()
   @IsString()
   lastName: string;
 
   @IsString()
+  @IsNotEmpty()
   ageGroup: string;
 
   @IsString()
+  @IsNotEmpty()
   ownerTel: string;
 
   @IsOptional()
   @IsString()
   tel: string;
 
+  @IsOptional()
   @IsString()
   code: string;
 
   @IsString()
+  @IsNotEmpty()
   color: string;
 
   @IsOptional()
@@ -38,27 +49,34 @@ export class CreateSubscriptionDto {
   gender?: string;
 
   @IsString()
+  @IsNotEmpty()
   size: string;
 
   @IsString()
+  @IsNotEmpty()
   station: string;
 
   @IsOptional()
   @IsString()
   remarks: string;
 
-  @IsNumber()
+  @IsString()
+  @IsNotEmpty()
   price: string;
 
   @IsNumber()
+  @IsOptional()
   self: number;
 
   @IsNumber()
+  @IsOptional()
   other: number;
 
   @IsDate()
+  @IsOptional()
   createdDate: Date;
 
   @IsBoolean()
+  @IsNotEmpty()
   isSelf: boolean;
 }

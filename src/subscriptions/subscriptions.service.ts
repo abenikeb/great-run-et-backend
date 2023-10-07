@@ -11,11 +11,15 @@ export class SubscriptionsService {
     private readonly subscribersRepository: Repository<Subscription>,
   ) {}
 
-  async create(createSubscriptionDto: CreateSubscriptionDto): Promise<any> {
+  async create(
+    createSubscriptionDto: CreateSubscriptionDto,
+    res,
+  ): Promise<any> {
     const { isSelf, ownerTel } = createSubscriptionDto;
 
     // Check if isSelf or ownerTel is empty
     if (!isSelf && !ownerTel) {
+      res.status(HttpStatus.BAD_REQUEST).send('Data is not completed');
       throw new HttpException('Data is not completed', HttpStatus.BAD_REQUEST);
     }
 
@@ -28,7 +32,8 @@ export class SubscriptionsService {
         .andWhere('YEAR(subscriber.createdDate) = YEAR(CURRENT_DATE())')
         .getCount();
 
-      if (selfCount > 1) {
+      if (selfCount >= 1) {
+        res.status(HttpStatus.BAD_REQUEST).send('Customer already subscribed');
         throw new HttpException(
           'Customer already subscribed',
           HttpStatus.BAD_REQUEST,
@@ -43,7 +48,10 @@ export class SubscriptionsService {
         .andWhere('YEAR(subscriber.createdDate) = YEAR(CURRENT_DATE())')
         .getCount();
 
-      if (otherCount > 2) {
+      if (otherCount > 1) {
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .send('Customer subscribed for other more than two');
         throw new HttpException(
           'Customer subscribed for other more than 2',
           HttpStatus.BAD_REQUEST,
@@ -57,6 +65,8 @@ export class SubscriptionsService {
     );
     await this.subscribersRepository.save(newSubscription);
 
+    res.status(HttpStatus.CREATED).send('Customer successfully subscribed!');
+
     return {
       status: HttpStatus.CREATED,
       message: 'Customer successfully subscribed!',
@@ -64,8 +74,40 @@ export class SubscriptionsService {
     };
   }
 
-  findAll() {
-    return `This action returns all subscriptions`;
+  async findAll(ownerTel: string, res): Promise<any | null> {
+    if (!ownerTel) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Parent phone cannot be empty.',
+        success: false,
+      });
+      // return {
+      //   message: 'Parent phone cannot be empty.',
+      //   success: false,
+      // };
+    }
+
+    const selfCount = await this.subscribersRepository
+      .createQueryBuilder('subscriber')
+      .where('subscriber.ownerTel = :ownerTel', { ownerTel })
+      .andWhere('subscriber.self > 0')
+      .andWhere('YEAR(subscriber.createdDate) = YEAR(CURRENT_DATE())')
+      .getCount();
+
+    const otherCount = await this.subscribersRepository
+      .createQueryBuilder('subscriber')
+      .where('subscriber.ownerTel = :ownerTel', { ownerTel })
+      .andWhere('subscriber.other > 1')
+      .andWhere('YEAR(subscriber.createdDate) = YEAR(CURRENT_DATE())')
+      .getCount();
+
+    res.status(HttpStatus.CREATED).json({
+      self: selfCount,
+      other: otherCount,
+    });
+    // return {
+    //   self: selfCount,
+    //   other: otherCount,
+    // };
   }
 
   findOne(id: number) {
