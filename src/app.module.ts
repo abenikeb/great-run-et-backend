@@ -14,9 +14,9 @@ import { UserModule } from './user/user.module';
 import { AuthGuard } from './auth/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { Users } from './user/entities/user.entity';
-import { SubCategoriesModule } from './sub_categories/sub_categories.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
+// import { StockControlsModule } from './stock-controls/stock-controls.module';
 
 @Module({
   imports: [
@@ -36,8 +36,8 @@ import { Subscription } from './subscriptions/entities/subscription.entity';
     }),
     AuthModule,
     UserModule,
-    SubCategoriesModule,
     SubscriptionsModule,
+    // StockControlsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -15,12 +15,20 @@ export class SubscriptionsService {
     createSubscriptionDto: CreateSubscriptionDto,
     res,
   ): Promise<any> {
-    const { isSelf, ownerTel } = createSubscriptionDto;
+    const { isSelf, ownerTel, price } = createSubscriptionDto;
 
     // Check if isSelf or ownerTel is empty
     if (!isSelf && !ownerTel) {
       res.status(HttpStatus.BAD_REQUEST).send('Data is not completed');
       throw new HttpException('Data is not completed', HttpStatus.BAD_REQUEST);
+    }
+
+    // Check if price per T-shirt is $1200
+    if (price !== '1200') {
+      throw new HttpException(
+        'Invalid price per T-shirt',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     // Check if isSelf is true and selfCount is greater than 1
@@ -58,6 +66,16 @@ export class SubscriptionsService {
         );
       }
     }
+
+    // Check stock availability
+    // const stockAvailable =
+    //   await this.stockControlService.checkStockAvailability(color, size);
+    // if (!stockAvailable) {
+    //   throw new HttpException(
+    //     'Selected stock is not available',
+    //     HttpStatus.BAD_REQUEST,
+    //   );
+    // }
 
     // Create a new subscription
     const newSubscription = this.subscribersRepository.create(
