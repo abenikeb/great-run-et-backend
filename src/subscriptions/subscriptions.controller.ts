@@ -27,7 +27,7 @@ export class SubscriptionsController {
   @Post('create')
   create(
     @Body() createSubscriptionDto: CreateSubscriptionDto,
-    @Res() res: Response,
+    @Res() res?: Response,
   ) {
     return this.subscriptionsService.create(createSubscriptionDto, res);
   }

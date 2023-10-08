@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { StockControlService } from 'src/stock-controls/stock-controls.service';
+import { Response } from 'express';
 
 @Injectable()
 export class SubscriptionsService {
@@ -15,7 +16,7 @@ export class SubscriptionsService {
 
   async create(
     createSubscriptionDto: CreateSubscriptionDto,
-    res,
+    res?: Response,
   ): Promise<any> {
     try {
       const { isSelf, ownerTel, price, color, size } = createSubscriptionDto;
@@ -51,10 +52,15 @@ export class SubscriptionsService {
           res
             .status(HttpStatus.BAD_REQUEST)
             .send('Customer already subscribed');
-          throw new HttpException(
-            'Customer already subscribed',
-            HttpStatus.BAD_REQUEST,
-          );
+          return {
+            status: HttpStatus.BAD_REQUEST,
+            message: 'Customer already subscribed',
+            success: false,
+          };
+          // throw new HttpException(
+          //   'Customer already subscribed',
+          //   HttpStatus.BAD_REQUEST,
+          // );
         }
       } else {
         // Check if isSelf is false and otherCount is greater than 2
@@ -69,10 +75,11 @@ export class SubscriptionsService {
           res
             .status(HttpStatus.BAD_REQUEST)
             .send('Customer subscribed for other more than two');
-          throw new HttpException(
-            'Customer subscribed for other more than 2',
-            HttpStatus.BAD_REQUEST,
-          );
+          return {
+            status: HttpStatus.BAD_REQUEST,
+            message: 'Customer subscribed for other more than two',
+            success: false,
+          };
         }
       }
 
@@ -85,7 +92,11 @@ export class SubscriptionsService {
           .send(
             `Stock not available for ${color} color and ${size} size or Selected stock is not available`,
           );
-        return null;
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: `Stock not available for ${color} color and ${size} size or Selected stock is not available`,
+          success: false,
+        };
       }
 
       // Create a new subscription
@@ -133,7 +144,6 @@ export class SubscriptionsService {
       };
     } catch (error) {
       res.status(500).send('Something went Wrong');
-
       return {
         message: 'Something went Wrong',
         success: false,
@@ -195,9 +205,9 @@ export class SubscriptionsService {
     return `This action returns a #${id} subscription`;
   }
 
-  // update(id: number, updateSubscriptionDto: UpdateSubscriptionDto) {
-  //   return `This action updates a #${id} subscription`;
-  // }
+  update(id: number, updateSubscriptionDto: any) {
+    return `This action updates a #${id} subscription`;
+  }
 
   remove(id: number) {
     return `This action removes a #${id} subscription`;

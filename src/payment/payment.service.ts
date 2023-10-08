@@ -1,50 +1,58 @@
 import { Injectable } from '@nestjs/common';
+import axios from 'src/utility/axios-instance';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { ConfigService } from '@nestjs/config';
 import { ApplyFabricTokenService } from './applyFabricToeknService.service';
-import { HttpService } from '@nestjs/axios';
-import { Tools } from '../utils/tools';
-import { ConfigService } from '../config/config.js';
-// import { createSub } from './createSub';
-// import { HttpsAgent } from 'https';
-// import { Request } from 'request';
+import { signRequestObject, createTimeStamp, createNonceStr } from '../utility';
+import { SubscriptionsService } from 'src/subscriptions/subscriptions.service';
 
 @Injectable()
 export class PaymentService {
   constructor(
+    private readonly config: ConfigService,
+    private readonly subscriptionsService: SubscriptionsService,
+    // private readonly subscriptionsController: SubscriptionsController,
     private readonly applyFabricToken: ApplyFabricTokenService,
-    private readonly tools: Tools,
-    private readonly configService: ConfigService,
-    private readonly httpService: HttpService,
   ) {}
-  async createOrder(reqBody: any): Promise<any | null> {
+  async createOrder(reqBody: any, res): Promise<any | null> {
     let title = reqBody.title;
     let amount = reqBody.amount;
-    let info = reqBody.data;
+    let customerInfo = reqBody.data;
     let merch_order_id = this.createMerchantOrderId();
+
     try {
-      // await createSub(info, merch_order_id);
+      // info, merch_order_id;
+      const { success } = await this.subscriptionsService.create(
+        customerInfo,
+        res,
+      );
+      if (!success) return null;
+
       let applyFabricTokenResult =
         await this.applyFabricToken.applyFabricToken();
-      let fabricToken = applyFabricTokenResult.token;
-      console.log({
-        fabricToken,
-      });
+      let fabricToken = await applyFabricTokenResult.token;
+
       let createOrderResult = await this.requestCreateOrder(
         fabricToken,
         title,
         amount,
         merch_order_id,
       );
-      console.log({ createOrderResult });
+      console.log({ orderResponse: createOrderResult });
 
       let prepayId = createOrderResult.biz_content.prepay_id;
+      if (!prepayId || prepayId === 'undefined') {
+        res.status(500).send('some thing went wrong');
+        return;
+      }
       let rawRequest = this.createRawRequest(prepayId);
       console.log({ rawRequest });
+      res.status(200).send(rawRequest);
       return rawRequest;
     } catch (error) {
-      console.log(error);
-      throw error;
+      res.status(500).send(error);
+      return;
     }
   }
 
@@ -55,24 +63,22 @@ export class PaymentService {
     merch_order_id: string,
   ): Promise<any> {
     const reqObject = this.createRequestObject(title, amount, merch_order_id);
-    console.log(reqObject);
-
-    const url = `${this.configService.baseUrl}/payment/v1/merchant/preOrder`;
+    const url = `${this.config.get('baseUrl')}/payment/v1/merchant/preOrder`;
     const headers = {
       'Content-Type': 'application/json',
-      'X-APP-Key': this.configService.fabricAppId,
+      'X-APP-Key': this.config.get('fabricAppId'),
       Authorization: fabricToken,
     };
 
     try {
-      const response = await this.httpService
-        .post(url, reqObject, { headers })
-        .toPromise();
-
-      console.log(response.data);
-      return response.data;
+      const { data: response } = await axios({
+        method: 'post',
+        url,
+        headers,
+        data: reqObject,
+      });
+      return response;
     } catch (error) {
-      console.log(error);
       throw new Error(error);
     }
   }
@@ -83,8 +89,8 @@ export class PaymentService {
     merch_order_id: string,
   ): any {
     const req: any = {
-      timestamp: this.tools.createTimeStamp(),
-      nonce_str: this.tools.createNonceStr(),
+      timestamp: createTimeStamp(),
+      nonce_str: createNonceStr(),
       method: 'payment.preorder',
       version: '1.0',
     };
@@ -92,23 +98,21 @@ export class PaymentService {
     const biz = {
       notify_url: 'https://telegebeya2.ethiotelecom.et/serviceapi/v1/notify',
       trade_type: 'InApp',
-      appid: this.configService.merchantAppId,
-      merch_code: this.configService.merchantCode,
+      appid: this.config.get('merchantAppId'),
+      merch_code: this.config.get('merchantCode'),
       merch_order_id: merch_order_id,
       title: title,
       total_amount: amount,
       trans_currency: 'ETB',
       timeout_express: '120m',
-      payee_identifier: this.configService.merchantCode,
+      payee_identifier: this.config.get('merchantCode'),
       payee_identifier_type: '04',
       payee_type: '5000',
     };
-
     req.biz_content = biz;
-    req.sign = this.tools.signRequestObject(req);
+    req.sign = signRequestObject(req);
     req.sign_type = 'SHA256WithRSA';
-
-    console.log({ req });
+    console.log({ request: req });
     return req;
   }
 
@@ -118,20 +122,18 @@ export class PaymentService {
 
   createRawRequest(prepayId: string): string {
     const map = {
-      appid: this.configService.merchantAppId,
-      merch_code: this.configService.merchantCode,
-      nonce_str: this.tools.createNonceStr(),
+      appid: this.config.get('merchantAppId'),
+      merch_code: this.config.get('merchantCode'),
+      nonce_str: createNonceStr(),
       prepay_id: prepayId,
-      timestamp: this.tools.createTimeStamp(),
+      timestamp: createTimeStamp(),
     };
 
-    const sign = this.tools.signRequestObject(map);
+    const sign = signRequestObject(map);
     const rawRequest = Object.entries(map)
       .map(([key, value]) => `${key}=${value}`)
       .concat(['sign=' + sign, 'sign_type=SHA256WithRSA'])
       .join('&');
-
-    console.log('rawRequest = ', rawRequest);
     return rawRequest;
   }
 
@@ -155,3 +157,16 @@ export class PaymentService {
     return `This action removes a #${id} payment`;
   }
 }
+
+//  let { data: res } = await axios({
+//    method: 'post',
+//    url: this.config.get('url'),
+//    headers: {
+//      'Content-Type': 'application/json',
+//    },
+//    data: customerInfo,
+//  });
+//  console.log({
+//    res,
+//  });
+//  return;

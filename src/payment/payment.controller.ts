@@ -6,18 +6,25 @@ import {
   Patch,
   Param,
   Delete,
+  SetMetadata,
+  Res,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
+import { Response } from 'express';
+
+const IS_PUBLIC_KEY = 'isPublic';
+const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
+  @Public()
   @Post('create/order')
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentService.create(createPaymentDto);
+  create(@Body() createPaymentDto: any, @Res() res: Response) {
+    return this.paymentService.createOrder(createPaymentDto, res);
   }
 
   @Get()

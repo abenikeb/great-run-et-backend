@@ -10,5 +10,6 @@ import { StockControlsModule } from 'src/stock-controls/stock-controls.module';
   imports: [StockControlsModule, TypeOrmModule.forFeature([Subscription])],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
+  exports: [SubscriptionsService],
 })
 export class SubscriptionsModule {}
