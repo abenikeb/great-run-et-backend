@@ -53,10 +53,10 @@ export class Subscription {
   @Column()
   price: string;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   self: number;
 
-  @Column({ nullable: true })
+  @Column({ default: 0 })
   other: number;
 
   @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })

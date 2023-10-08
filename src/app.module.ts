@@ -16,7 +16,11 @@ import { APP_GUARD } from '@nestjs/core';
 import { Users } from './user/entities/user.entity';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
-// import { StockControlsModule } from './stock-controls/stock-controls.module';
+import { StockControlsModule } from './stock-controls/stock-controls.module';
+import {
+  GreenWave,
+  YellowWave,
+} from './stock-controls/entities/stock-control.entity';
 
 @Module({
   imports: [
@@ -31,13 +35,13 @@ import { Subscription } from './subscriptions/entities/subscription.entity';
       username: 'root',
       password: '',
       database: 'great_run', // your database name
-      entities: [Users, Subscription],
+      entities: [Users, Subscription, GreenWave, YellowWave],
       synchronize: true, // for dev envirnoment only
     }),
     AuthModule,
     UserModule,
     SubscriptionsModule,
-    // StockControlsModule,
+    StockControlsModule,
   ],
   controllers: [AppController],
   providers: [

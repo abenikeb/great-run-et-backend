@@ -3,19 +3,22 @@ import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subscription } from './entities/subscription.entity';
+import { StockControlService } from 'src/stock-controls/stock-controls.service';
 
 @Injectable()
 export class SubscriptionsService {
   constructor(
     @InjectRepository(Subscription)
     private readonly subscribersRepository: Repository<Subscription>,
+    private readonly stockControlService: StockControlService,
   ) {}
 
   async create(
     createSubscriptionDto: CreateSubscriptionDto,
     res,
   ): Promise<any> {
-    const { isSelf, ownerTel, price } = createSubscriptionDto;
+    const { isSelf, ownerTel, price, color, size } = createSubscriptionDto;
+    console.log({ isSelf, ownerTel, price, color, size });
 
     // Check if isSelf or ownerTel is empty
     if (!isSelf && !ownerTel) {
@@ -56,7 +59,7 @@ export class SubscriptionsService {
         .andWhere('YEAR(subscriber.createdDate) = YEAR(CURRENT_DATE())')
         .getCount();
 
-      if (otherCount > 1) {
+      if (otherCount >= 1) {
         res
           .status(HttpStatus.BAD_REQUEST)
           .send('Customer subscribed for other more than two');
@@ -68,20 +71,56 @@ export class SubscriptionsService {
     }
 
     // Check stock availability
-    // const stockAvailable =
-    //   await this.stockControlService.checkStockAvailability(color, size);
-    // if (!stockAvailable) {
-    //   throw new HttpException(
-    //     'Selected stock is not available',
-    //     HttpStatus.BAD_REQUEST,
-    //   );
-    // }
+    const stockAvailable =
+      await this.stockControlService.checkStockAvailability(color, size);
+    if (!stockAvailable) {
+      res
+        .status(HttpStatus.BAD_REQUEST)
+        .send(
+          `Stock not available for ${color} color and ${size} size or Selected stock is not available`,
+        );
+      return null;
+    }
 
     // Create a new subscription
-    const newSubscription = this.subscribersRepository.create(
+    let newSubscription = this.subscribersRepository.create(
       createSubscriptionDto,
     );
     await this.subscribersRepository.save(newSubscription);
+
+    // Update subscription table
+    let qoutaCounter;
+    if (isSelf) {
+      qoutaCounter = await this.subscribersRepository.findOne({
+        where: { id: newSubscription.id },
+      });
+      console.log({
+        qoutaCounter_self: qoutaCounter.self,
+      });
+      qoutaCounter.self += 1;
+    } else {
+      let totalQoutaCounter = await this.subscribersRepository.find({
+        where: { ownerTel: ownerTel, isSelf: false },
+        order: { id: 'DESC' },
+      });
+      let prevQouta = totalQoutaCounter[1]?.other;
+
+      if (prevQouta) {
+        qoutaCounter = await this.subscribersRepository.findOne({
+          where: { id: newSubscription.id },
+        });
+        qoutaCounter.other = prevQouta + 1;
+      } else {
+        qoutaCounter = await this.subscribersRepository.findOne({
+          where: { id: newSubscription.id },
+        });
+        qoutaCounter.other += 1;
+      }
+    }
+    await this.subscribersRepository.save(qoutaCounter);
+
+    // Update Waves tables in StockControlService
+    await this.stockControlService.updateStock(color, size);
 
     res.status(HttpStatus.CREATED).send('Customer successfully subscribed!');
 

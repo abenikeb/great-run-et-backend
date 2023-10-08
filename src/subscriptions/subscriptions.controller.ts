@@ -14,6 +14,7 @@ import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto';
 import { query, Response, Request } from 'express';
+import { StockControlService } from 'src/stock-controls/stock-controls.service';
 
 const IS_PUBLIC_KEY = 'isPublic';
 const Public = () => SetMetadata(IS_PUBLIC_KEY, true);
