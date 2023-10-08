@@ -12,7 +12,6 @@ export class PaymentService {
   constructor(
     private readonly config: ConfigService,
     private readonly subscriptionsService: SubscriptionsService,
-    // private readonly subscriptionsController: SubscriptionsController,
     private readonly applyFabricToken: ApplyFabricTokenService,
   ) {}
   async createOrder(reqBody: any, res): Promise<any | null> {
@@ -22,9 +21,9 @@ export class PaymentService {
     let merch_order_id = this.createMerchantOrderId();
 
     try {
-      // info, merch_order_id;
+      let newCustomerInfo = { ...customerInfo, merch_order_id };
       const { success } = await this.subscriptionsService.create(
-        customerInfo,
+        newCustomerInfo,
         res,
       );
       if (!success) return null;

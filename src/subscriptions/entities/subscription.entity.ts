@@ -67,4 +67,7 @@ export class Subscription {
 
   @Column({ default: true })
   isSelf: boolean;
+
+  @Column({ nullable: true })
+  merch_order_id: string;
 }

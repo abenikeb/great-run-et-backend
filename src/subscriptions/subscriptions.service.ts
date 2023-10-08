@@ -20,7 +20,6 @@ export class SubscriptionsService {
   ): Promise<any> {
     try {
       const { isSelf, ownerTel, price, color, size } = createSubscriptionDto;
-      console.log({ isSelf, ownerTel, price, color, size });
 
       // Check if isSelf or ownerTel is empty
       if (!isSelf && !ownerTel) {
@@ -135,7 +134,7 @@ export class SubscriptionsService {
       // Update Waves tables in StockControlService
       await this.stockControlService.updateStock(color, size);
 
-      res.status(HttpStatus.CREATED).send('Customer successfully subscribed!');
+      // res.status(HttpStatus.CREATED).send('Customer successfully subscribed!');
 
       return {
         status: HttpStatus.CREATED,

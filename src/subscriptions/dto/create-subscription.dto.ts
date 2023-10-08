@@ -79,4 +79,8 @@ export class CreateSubscriptionDto {
   @IsBoolean()
   @IsNotEmpty()
   isSelf: boolean;
+
+  @IsOptional()
+  @IsString()
+  merch_order_id: string;
 }
