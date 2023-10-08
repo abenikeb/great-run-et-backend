@@ -21,6 +21,7 @@ import {
   GreenWave,
   YellowWave,
 } from './stock-controls/entities/stock-control.entity';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import {
     UserModule,
     SubscriptionsModule,
     StockControlsModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [

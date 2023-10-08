@@ -32,6 +32,7 @@ export class SubscriptionsController {
     return this.subscriptionsService.create(createSubscriptionDto, res);
   }
 
+  @Public()
   @Get('get-all')
   async findAll(@Query('ownerTel') ownerTel: string, @Res() res: Response) {
     return this.subscriptionsService.findAll(ownerTel, res);
