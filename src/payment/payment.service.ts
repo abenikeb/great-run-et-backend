@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import axios from 'src/utility/axios-instance';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { UpdatePaymentDto } from './dto/update-payment.dto';
@@ -55,6 +55,21 @@ export class PaymentService {
     }
   }
 
+  async createCallBack(reqBody: any, res): Promise<any | null> {
+    console.log({ message: 'Notify Response Hits HERE!' });
+
+    try {
+      const { success } = await this.subscriptionsService.update(
+        reqBody.merch_order_id,
+        reqBody.transId,
+      );
+      // await confirmSub(req.body.merch_order_id, req.body.transId);
+      return res.status(HttpStatus.OK).send('OK');
+    } catch (error) {
+      return res.status(HttpStatus.BAD_REQUEST).send('error');
+    }
+  }
+
   async requestCreateOrder(
     fabricToken: string,
     title: string,
@@ -95,7 +110,8 @@ export class PaymentService {
     };
 
     const biz = {
-      notify_url: 'https://telegebeya2.ethiotelecom.et/serviceapi/v1/notify',
+      notify_url:
+        'https://telegebeya2.ethiotelecom.et/serviceapi/payment/v1/notify',
       trade_type: 'InApp',
       appid: this.config.get('merchantAppId'),
       merch_code: this.config.get('merchantCode'),

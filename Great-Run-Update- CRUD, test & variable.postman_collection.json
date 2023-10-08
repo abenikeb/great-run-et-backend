@@ -14,12 +14,12 @@
 				{
 					"listen": "test",
 					"script": {
-						"type": "text/javascript",
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -27,17 +27,18 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/info?id=1",
+					"raw": "{{base_url}}/subscriptions/get-all?ownerTel=251913228892",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
-						"info"
+						"subscriptions",
+						"get-all"
 					],
 					"query": [
 						{
-							"key": "id",
-							"value": "1"
+							"key": "ownerTel",
+							"value": "251913228892"
 						}
 					]
 				},
@@ -81,6 +82,49 @@
 					"path": [
 						"subscriptions",
 						"create"
+					]
+				},
+				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."
+			},
+			"response": []
+		},
+		{
+			"name": "Post data payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successful POST request\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"title\": \"green_tshert\",\n    \"amount\": \"1200\",\n    \"data\": {\n        \"ownerName\": \"Abenezer\", //The station can't be null\n        \"firstName\": \"\",\n        \"middleName\": \"Kebede\",\n        \"lastName\": \"Kemisso\",\n        \"ageGroup\": \"10_18\",\n        \"ownerTel\": \"251913228892\", //The ownerTel can't be null\n        \"tel\": \"\",\n        \"code\": \"\", //ref number\n        \"color\": \"green\",\n        \"gender\": \"male\",\n        \"size\": \"small\",\n        \"station\": \"2323\", //The station can't be null\n        \"remarks\": \"recall me some thing when the tshirt ready for deliver\",\n        \"price\": \"1200\", //The price should be 1200\n        \"isSelf\": false //The isSelf should be boolean\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/payment/create/order",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"payment",
+						"create",
+						"order"
 					]
 				},
 				"description": "This is a POST request, submitting data to an API via the request body. This request submits JSON data, and the data is reflected in the response.\n\nA successful POST request typically returns a `200 OK` or `201 Created` response code."

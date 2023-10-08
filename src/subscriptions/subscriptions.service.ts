@@ -19,7 +19,8 @@ export class SubscriptionsService {
     res?: Response,
   ): Promise<any> {
     try {
-      const { isSelf, ownerTel, price, color, size } = createSubscriptionDto;
+      const { isSelf, ownerTel, price, color, size, station } =
+        createSubscriptionDto;
 
       // Check if isSelf or ownerTel is empty
       if (!isSelf && !ownerTel) {
@@ -36,6 +37,15 @@ export class SubscriptionsService {
           'Invalid price per T-shirt',
           HttpStatus.BAD_REQUEST,
         );
+      }
+
+      if (station === '') {
+        res.status(HttpStatus.BAD_REQUEST).send('Station can not br null');
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          message: 'Station can not br null',
+          success: false,
+        };
       }
 
       // Check if isSelf is true and selfCount is greater than 1
@@ -204,8 +214,31 @@ export class SubscriptionsService {
     return `This action returns a #${id} subscription`;
   }
 
-  update(id: number, updateSubscriptionDto: any) {
-    return `This action updates a #${id} subscription`;
+  async update(merch_order_id: string, reference: string) {
+    try {
+      if (!reference) {
+        return {
+          message: 'Reference cannot be empty.',
+          success: false,
+        };
+      }
+
+      await this.subscribersRepository.update(
+        { merch_order_id },
+        { code: reference },
+      );
+
+      return {
+        message: 'Confirmation',
+        success: true,
+      };
+    } catch (error) {
+      return {
+        message: 'Error',
+        success: false,
+      };
+    }
+    // return `This action updates a #${id} subscription`;
   }
 
   remove(id: number) {

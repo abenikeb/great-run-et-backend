@@ -27,6 +27,13 @@ export class PaymentController {
     return this.paymentService.createOrder(createPaymentDto, res);
   }
 
+  //Callback function
+  @Public()
+  @Post('api/v1/notify')
+  createCallBack(@Body() createPaymentDto: any, @Res() res: Response) {
+    return this.paymentService.createCallBack(createPaymentDto, res);
+  }
+
   @Get()
   findAll() {
     return this.paymentService.findAll();
