@@ -38,6 +38,12 @@ export class SubscriptionsController {
     return this.subscriptionsService.findAll(ownerTel, res);
   }
 
+  @Public()
+  @Get('get-all-data')
+  async findAllData(@Query('ownerTel') ownerTel: string, @Res() res: Response) {
+    return this.subscriptionsService.findAllData(ownerTel, res);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.subscriptionsService.findOne(+id);

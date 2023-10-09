@@ -22,6 +22,7 @@ import {
   YellowWave,
 } from './stock-controls/entities/stock-control.entity';
 import { PaymentModule } from './payment/payment.module';
+import { AuthLoginModule } from './auth-login/auth-login.module';
 
 @Module({
   imports: [
@@ -29,13 +30,23 @@ import { PaymentModule } from './payment/payment.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    // TypeOrmModule.forRoot({
+    //   type: 'mysql',
+    //   host: 'localhost',
+    //   port: 3306,
+    //   username: 'root',
+    //   password: '',
+    //   database: 'great_run', // your database name
+    //   entities: [Users, Subscription, GreenWave, YellowWave],
+    //   synchronize: true, // for dev envirnoment only
+    // }),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '',
-      database: 'great_run', // your database name
+      password: 'admin1234',
+      database: 'test', // your database name
       entities: [Users, Subscription, GreenWave, YellowWave],
       synchronize: true, // for dev envirnoment only
     }),
@@ -44,6 +55,7 @@ import { PaymentModule } from './payment/payment.module';
     SubscriptionsModule,
     StockControlsModule,
     PaymentModule,
+    AuthLoginModule,
   ],
   controllers: [AppController],
   providers: [

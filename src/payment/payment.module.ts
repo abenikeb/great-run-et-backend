@@ -9,5 +9,6 @@ import { SubscriptionsModule } from 'src/subscriptions/subscriptions.module';
   imports: [SubscriptionsModule],
   controllers: [PaymentController],
   providers: [PaymentService, ConfigService, ApplyFabricTokenService],
+  exports: [ApplyFabricTokenService],
 })
 export class PaymentModule {}

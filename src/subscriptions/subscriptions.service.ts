@@ -152,7 +152,7 @@ export class SubscriptionsService {
         success: true,
       };
     } catch (error) {
-      res.status(500).send('Something went Wrong');
+      res.status(500).send('Something went Wrong' + error);
       return {
         message: 'Something went Wrong',
         success: false,
@@ -204,6 +204,32 @@ export class SubscriptionsService {
         extra_extra_large: 100,
       },
     });
+    // return {
+    //   self: selfCount,
+    //   other: otherCount,
+    // };
+  }
+
+  async findAllData(ownerTel: string, res): Promise<any | null> {
+    if (!ownerTel) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Parent phone cannot be empty.',
+        success: false,
+      });
+      return {
+        message: 'Parent phone cannot be empty.',
+        success: false,
+      };
+    }
+
+    let result = await this.subscribersRepository.find({
+      where: { ownerTel },
+    });
+
+    res.status(HttpStatus.OK).send(result);
+
+    return result;
+
     // return {
     //   self: selfCount,
     //   other: otherCount,

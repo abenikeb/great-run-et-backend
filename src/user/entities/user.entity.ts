@@ -47,8 +47,8 @@ export class Users {
   @Column()
   otp: string;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  otp_expiry: Date;
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // otp_expiry: Date;
 
   @Column()
   payment_id: number;
@@ -68,11 +68,11 @@ export class Users {
   @Column()
   role: number;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  created_at: number;
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // created_at: number;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
-  modified_at: number;
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // modified_at: number;
 
   @Column()
   rating: number;

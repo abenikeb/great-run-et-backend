@@ -59,15 +59,16 @@ export class Subscription {
   @Column({ default: 0 })
   other: number;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  // @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   createdDate: Date;
 
-  @CreateDateColumn({ default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn()
   updatedDate: Date;
 
   @Column({ default: true })
   isSelf: boolean;
 
-  @Column({ nullable: true })
+  @Column({ default: 'pending' })
   merch_order_id: string;
 }
